@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Anki Şarkı Kartları{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/css/tom-select.default.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <h1><a href="/" class="logo-link">Şarkı Sözlerinden Anki Kartları</a></h1>
+        <p class="subtitle">LLM ile dil öğrenme destesi oluştur</p>
+    </header>
+
+    <div class="app-layout">
+        <aside class="sidebar">
+            <h2 class="sidebar-title">Kayıtlı şarkılar</h2>
+            {% if history_songs %}
+            <ul class="history-list">
+                {% for s in history_songs %}
+                <li>
+                    <a href="{{ url_for('main.song_page', song_id=s.id) }}"
+                       class="history-item {% if active_song_id is defined and active_song_id == s.id %}active{% endif %}">
+                        <span class="history-title">{{ s.artist }} — {{ s.title }}</span>
+                        <span class="history-meta">{{ s.source_lang_name }} → {{ s.target_lang_name }} · {{ s.card_count }} kart</span>
+                        <span class="history-date">{{ s.created_at }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="sidebar-empty">Henüz analiz yok. Yeni şarkı arayın.</p>
+            {% endif %}
+        </aside>
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/js/tom-select.complete.min.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

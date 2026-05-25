@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="search-panel">
+    <div class="lang-row">
+        <label class="lang-field">
+            Kaynak dil
+            <select id="sourceLang" class="lang-tom-select" placeholder="Dil seçin...">
+                <option value="auto" selected>Otomatik (algıla)</option>
+                {% for code, name in languages %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" id="sourceLangCustom" class="lang-custom hidden" placeholder="Dil adını yazın (Diğer)">
+        </label>
+        <label class="lang-field">
+            Hedef dil
+            <select id="targetLang" class="lang-tom-select" placeholder="Dil seçin...">
+                {% for code, name in languages %}
+                <option value="{{ code }}" {% if code == 'tr' %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" id="targetLangCustom" class="lang-custom hidden" placeholder="Dil adını yazın (Diğer)">
+        </label>
+    </div>
+
+    <div class="search-row">
+        <input type="text" id="searchQuery" placeholder="Şarkı veya sanatçı adı ara...">
+        <button id="searchBtn" type="button">Ara</button>
+    </div>
+
+    <p id="searchError" class="error hidden"></p>
+    <ul id="resultsList" class="results-list"></ul>
+
+    <button id="analyzeBtn" type="button" class="primary-btn hidden">Sözleri Analiz Et</button>
+    <p id="analyzeStatus" class="status hidden"></p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>initSearchPage();</script>
+{% endblock %}

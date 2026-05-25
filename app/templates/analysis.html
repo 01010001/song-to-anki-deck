@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{{ artist }} — {{ title }}{% endblock %}
+
+{% block content %}
+<section class="analysis-header">
+    <a href="/" class="back-link">← Yeni arama</a>
+    <h2>{{ artist }} — {{ title }}</h2>
+    <p class="lang-badge">{{ source_lang_name }} → {{ target_lang_name }}</p>
+</section>
+
+<section class="analysis-panel">
+    <div class="panel left">
+        <h3>Orijinal Sözler</h3>
+        <pre class="lyrics-box">{{ lyrics }}</pre>
+    </div>
+    <div class="panel right">
+        <h3>Anki Kartları <span class="hint">(Düzenlemek için ✎)</span></h3>
+        {% if cards %}
+        <table class="cards-table" id="cardsTable" data-song-id="{{ song_id }}" data-show-romaji="{{ 'true' if show_romaji else 'false' }}">
+            <thead>
+                <tr>
+                    <th>{% if show_romaji %}Japonca{% else %}Kaynak{% endif %}</th>
+                    {% if show_romaji %}<th>Romaji</th>{% endif %}
+                    <th>Çeviri</th>
+                    <th>Zorluk</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for card in cards %}
+                <tr data-card-id="{{ card.id }}">
+                    <td class="cell-front">{{ card.front }}</td>
+                    {% if show_romaji %}<td class="cell-romaji romaji-cell">{{ card.romaji or '—' }}</td>{% endif %}
+                    <td class="cell-back">{{ card.back }}</td>
+                    <td class="cell-diff"><span class="badge">{{ card.difficulty }}</span></td>
+                    <td class="cell-actions">
+                        <button type="button" class="btn-edit" title="Düzenle">✎</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty">Kart oluşturulamadı.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="export-panel">
+    <button id="exportBtn" type="button" class="primary-btn" data-song-id="{{ song_id }}">.apkg İndir</button>
+    <p id="exportError" class="error hidden"></p>
+</section>
+
+<div id="editModal" class="modal hidden">
+    <div class="modal-box">
+        <h3>Kartı düzenle</h3>
+        <form id="editCardForm">
+            <input type="hidden" id="editCardId">
+            <label>Ön yüz (kaynak)
+                <input type="text" id="editFront" required>
+            </label>
+            {% if show_romaji %}
+            <label>Romaji
+                <input type="text" id="editRomaji" required>
+            </label>
+            {% endif %}
+            <label>Arka yüz (çeviri)
+                <input type="text" id="editBack" required>
+            </label>
+            <label>Zorluk
+                <select id="editDifficulty">
+                    <option value="kolay">kolay</option>
+                    <option value="orta">orta</option>
+                    <option value="zor">zor</option>
+                </select>
+            </label>
+            <p id="editError" class="error hidden"></p>
+            <div class="modal-actions">
+                <button type="button" id="editCancel" class="btn-secondary">İptal</button>
+                <button type="submit" class="primary-btn">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    initSongPage({{ song_id }}, {{ 'true' if show_romaji else 'false' }});
+</script>
+{% endblock %}
