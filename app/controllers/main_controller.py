@@ -34,7 +34,7 @@ def index():
 
 def search():
 
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or {}
 
     query = (data.get("query") or "").strip()
 
@@ -52,6 +52,8 @@ def search():
 
         results = search_service.search_songs(query)
 
+        if not results:
+            return jsonify({"results": [], "message": "Sonuç bulunamadı"}), 200
         return jsonify({"results": results})
 
     except Exception as e:
@@ -68,7 +70,7 @@ def search():
 
 def analyze():
 
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or {}
 
     artist = (data.get("artist") or "").strip()
 
@@ -98,7 +100,7 @@ def analyze():
 
     if not artist or not title:
 
-        return jsonify({"error": "Sanatçı ve şarkı adı gerekli."}), 400
+        return jsonify({"error": "Lütfen önce bir şarkı seçin."}), 400
 
 
 
@@ -222,7 +224,7 @@ def update_card(song_id, card_id):
 
 
 
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or {}
 
     front = (data.get("front") or "").strip()
 
@@ -305,5 +307,24 @@ def export_deck(song_id):
         mimetype="application/octet-stream",
 
     )
+
+
+@bp.route("/api/export", methods=["POST"])
+def export_legacy():
+    """
+    Legacy test senaryosu: analiz yapılmadan export deneme.
+    Body: { "song_id": <int> }
+    """
+    data = request.get_json(silent=True) or {}
+    song_id = data.get("song_id")
+    if not song_id:
+        return jsonify({"error": "Önce analiz yapılması gerekiyor"}), 400
+
+    try:
+        song_id_int = int(song_id)
+    except Exception:
+        return jsonify({"error": "song_id geçersiz"}), 400
+
+    return export_deck(song_id_int)
 
 

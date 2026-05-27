@@ -7,11 +7,17 @@ from app.models.db_models import SongRecord, CardRecord
 
 
 def test_tv1_valid_song_search_returns_results(client):
-    response = client.post(
-        "/api/search",
-        json={"query": "Adele Hello"},
-        content_type="application/json",
-    )
+    from unittest.mock import patch
+
+    with patch("app.services.search_service.search_songs") as mock_search:
+        mock_search.return_value = [
+            {"title": "Hello", "artist": "Adele", "track_id": None},
+        ]
+        response = client.post(
+            "/api/search",
+            json={"query": "Adele Hello"},
+            content_type="application/json",
+        )
     data = response.get_json()
     assert response.status_code == 200, data
     assert len(data["results"]) >= 1

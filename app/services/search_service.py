@@ -8,9 +8,17 @@ logger = logging.getLogger("search")
 # Geçersiz arama karakterleri (Test Vakası 1)
 INVALID_SEARCH_PATTERN = re.compile(r"^[^a-zA-Z0-9\sçğıöşüÇĞİÖŞÜ\-\'\.]+$")
 
+MAX_QUERY_LENGTH = 200
+
 
 def is_valid_search(query):
     query = query.strip()
+    if len(query) == 0:
+        logger.debug("Doğrulama FAIL: boş arama")
+        return False, "Arama alanı boş bırakılamaz"
+    if len(query) > MAX_QUERY_LENGTH:
+        logger.debug("Doğrulama FAIL: çok uzun arama (%d karakter)", len(query))
+        return False, "Arama çok uzun"
     if len(query) < 2:
         logger.debug("Doğrulama FAIL: çok kısa arama (%d karakter)", len(query))
         return False, "Arama en az 2 karakter olmalıdır."
